@@ -31,3 +31,4 @@ async def validate_token(token: str):
     if not username:
         raise HTTPException(status_code=401, detail="Invalid token")
     return {"username": username}
+# TODO: Add token expiry check
