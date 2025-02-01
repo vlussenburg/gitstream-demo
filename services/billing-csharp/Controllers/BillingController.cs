@@ -43,3 +43,4 @@ public class BillingController : ControllerBase
         return Ok(JsonSerializer.Serialize(responsePayload));
     }
 }
+// TODO: Log billing errors
