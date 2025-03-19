@@ -1,0 +1,41 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  mayhem_api_scan:
+    name: Mayhem for API Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start local server
+        run: |
+          docker compose up --wait
+          sleep 1 # wait for the server to start
+
+      - name: Run Mayhem for API Scan
+        uses: ForAllSecure/mapi-action@v2
+        with:
+          api-url: http://localhost:3000
+          api-spec: http://localhost:3000/swagger.json
+          run-args: |
+            --basic-auth
+            alice:password123
+        env:
+          MAYHEM_TOKEN: ${{ secrets.MAYHEM_TOKEN }}
