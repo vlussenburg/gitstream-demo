@@ -25,7 +25,7 @@ app.post("/api/orders", async (req, res) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": token,
+      "X-Authorization": token,
     },
     body: JSON.stringify(req.body),
   });
