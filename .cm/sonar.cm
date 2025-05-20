@@ -2,6 +2,13 @@
 
 manifest:
   version: 1.0
+
+triggers:
+  on:
+    - pr_created
+    - commit
+    - pr_ready_for_review
+
 automations:
   approve_sonar_clean_code:
     if:
