@@ -1,52 +1,14 @@
-var extractSonarFindings = function parseExtractSonarFindings(Me) {
-  return parseSonarParser(Me);
+
+
+const patterns = {
+  bugs: /\[(\d+)\s+New issues\]/i,
+  vulnerabilities: /\[(\d+)\s+Vulnerabilities\]/i,
+  code_smells: /\[(\d+)\s+Code Smells\]/i,
+  duplications: /\[(\d+(?:\.\d+)?)%\s+Duplication on New Code\]/i,
+  coverage: /\[(\d+(?:\.\d+)?)%\s+Coverage on New Code\]/i,
+  security_hotspots: /\[(\d+)\s+Security Hotspots\]/i
 };
 
-var parseSonarParser = function parseSonarParser(Me) {
-  var Bn = Me.comments.filter(function (Me) {
-    return Me.commenter === "sonarqubecloud";
-  });
-
-  if (!Bn.length) {
-    return JSON.stringify(defaultMetrics());
-  }
-
-  var Hn = Object.keys(patterns).reduce(function (Me, Hn) {
-    var zn;
-    var ni = patterns[Hn];
-    var Ci = Bn[0].content.match(ni);
-
-    if (Hn === "duplications" || Hn === "coverage") {
-      var aa;
-      var oa = parseFloat(Ci == null ? void 0 : Ci[1].replace("%", ""));
-      return Object.assign({}, Me, ((aa = {}), (aa[Hn] = oa || null), aa));
-    }
-
-    if (Hn === "security_hotspots") {
-      var ca, _a;
-      return Object.assign({}, Me, ((_a = {}), (_a[Hn] = {
-        count: Ci && (Ci == null || (ca = Ci[1]) == null ? void 0 : ca.toString()) !== "0" ? Ci[1] : null,
-        rating: ""
-      }), _a));
-    }
-
-    return Object.assign({}, Me, ((zn = {}), (zn[Hn] = {
-      count: Ci ? 1 : null,
-      rating: Ci ? Ci[1] : ""
-    }), zn));
-  }, defaultMetrics());
-
-  return JSON.stringify(Hn);
-};
-
-var patterns = {
-  bugs: /(\w+) Bugs?/i,
-  vulnerabilities: /(\w+) Vulnerabilities?/i,
-  code_smells: /(\w+) Code Smells?/i,
-  duplications: /Duplications[^\d]*(\d+\.?\d*)%/i,
-  coverage: /Coverage[^\d]*(\d+\.?\d*)%/i,
-  security_hotspots: /Security Hotspots[^\d]*(\d+)/i
-};
 
 function defaultMetrics() {
   return {
@@ -59,4 +21,59 @@ function defaultMetrics() {
   };
 }
 
+function extractSonarFindings(pr) {
+  const comments = pr.comments || [];
+  const sonarComment = comments.find(c =>
+    c.commenter?.toLowerCase().includes("sonarqubecloud")
+  );
+
+  if (!sonarComment?.content) return defaultMetrics();
+
+  // Normalize whitespace just in case
+  const content = sonarComment.content.replace(/\s+/g, ' ');
+  const findings = defaultMetrics();
+
+  for (const [key, regex] of Object.entries(patterns)) {
+    const match = content.match(regex);
+    if (!match) continue;
+
+    if (key === "coverage" || key === "duplications") {
+      findings[key] = parseFloat(match[1]) || 0;
+    } else {
+      findings[key] = {
+        count: match[1] !== "0" ? parseInt(match[1]) : 0,
+        rating: ""
+      };
+    }
+  }
+
+  return findings;
+};
+
 module.exports = extractSonarFindings;
+
+console.log(extractSonarFindings({
+
+  comments: [
+      {
+        "commenter": "sonarqubecloud",
+        "content": "## [![Quality Gate Passed](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/checks/QualityGateBadge/qg-passed-20px.png 'Quality Gate Passed')](https://sonarcloud.io/dashboard?id=vlussenburg_gitstream-demo&pullRequest=116) **Quality Gate passed**  \nIssues  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/passed-16px.png '') [10 New issues](https://sonarcloud.io/project/issues?id=vlussenburg_gitstream-demo&pullRequest=116&issueStatuses=OPEN,CONFIRMED&sinceLeakPeriod=true)  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/accepted-16px.png '') [1 Accepted issues](https://sonarcloud.io/project/issues?id=vlussenburg_gitstream-demo&pullRequest=116&issueStatuses=ACCEPTED)\n\nMeasures  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/passed-16px.png '') [5 Security Hotspots](https://sonarcloud.io/project/security_hotspots?id=vlussenburg_gitstream-demo&pullRequest=116&issueStatuses=OPEN,CONFIRMED&sinceLeakPeriod=true)  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/passed-16px.png '') [10.0% Coverage on New Code](https://sonarcloud.io/component_measures?id=vlussenburg_gitstream-demo&pullRequest=116&metric=new_coverage&view=list)  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/passed-16px.png '') [20.0% Duplication on New Code](https://sonarcloud.io/component_measures?id=vlussenburg_gitstream-demo&pullRequest=116&metric=new_duplicated_lines_density&view=list)  \n  \n[See analysis details on SonarQube Cloud](https://sonarcloud.io/dashboard?id=vlussenburg_gitstream-demo&pullRequest=116)\n\n",
+        "created_at": "2025-05-20T21:37:10Z",
+        "nodeId": "IC_kwDOOlGlhs6sm8yL",
+        "id": 2895891595
+      }
+  ]
+}));
+
+console.log(extractSonarFindings({
+
+  comments: [
+      {
+        "commenter": "sonarqubecloud",
+        "content": "## [![Quality Gate Passed](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/checks/QualityGateBadge/qg-passed-20px.png 'Quality Gate Passed')](https://sonarcloud.io/dashboard?id=vlussenburg_gitstream-demo&pullRequest=116) **Quality Gate passed**  \nIssues  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/passed-16px.png '') [0 New issues](https://sonarcloud.io/project/issues?id=vlussenburg_gitstream-demo&pullRequest=116&issueStatuses=OPEN,CONFIRMED&sinceLeakPeriod=true)  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/accepted-16px.png '') [0 Accepted issues](https://sonarcloud.io/project/issues?id=vlussenburg_gitstream-demo&pullRequest=116&issueStatuses=ACCEPTED)\n\nMeasures  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/passed-16px.png '') [0 Security Hotspots](https://sonarcloud.io/project/security_hotspots?id=vlussenburg_gitstream-demo&pullRequest=116&issueStatuses=OPEN,CONFIRMED&sinceLeakPeriod=true)  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/passed-16px.png '') [0.0% Coverage on New Code](https://sonarcloud.io/component_measures?id=vlussenburg_gitstream-demo&pullRequest=116&metric=new_coverage&view=list)  \n![](https://sonarsource.github.io/sonarcloud-github-static-resources/v2/common/passed-16px.png '') [0.0% Duplication on New Code](https://sonarcloud.io/component_measures?id=vlussenburg_gitstream-demo&pullRequest=116&metric=new_duplicated_lines_density&view=list)  \n  \n[See analysis details on SonarQube Cloud](https://sonarcloud.io/dashboard?id=vlussenburg_gitstream-demo&pullRequest=116)\n\n",
+        "created_at": "2025-05-20T21:37:10Z",
+        "nodeId": "IC_kwDOOlGlhs6sm8yL",
+        "id": 2895891595
+      }
+  ]
+}));
