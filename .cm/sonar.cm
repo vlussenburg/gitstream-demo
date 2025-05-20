@@ -17,7 +17,7 @@ automations:
       - action: add-comment@v1
         args:
           comments: |
-            extractSonarFindings: {{ extractSonarFindings | dump | safe }}
+            extractSonarFindings: {{ sonar | dump | safe }}
 
   approve_sonar_clean_code:
     if:
