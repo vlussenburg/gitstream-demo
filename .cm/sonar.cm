@@ -10,6 +10,15 @@ triggers:
     - pr_ready_for_review
 
 automations:
+  show_sonar_obj:
+    if:
+      - true
+    run:
+      - action: add-comment@v1
+        args:
+          comments: |
+            extractSonarFindings: {{ extractSonarFindings | dump | safe }}
+
   approve_sonar_clean_code:
     if:
       - {{ sonar.bugs.rating == 'A' }}
