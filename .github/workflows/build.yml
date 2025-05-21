@@ -5,6 +5,11 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  issues: write
+    
 jobs:
   sonarqube:
     name: SonarQube
