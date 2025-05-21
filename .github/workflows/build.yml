@@ -5,6 +5,11 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+  issues: write
+    
 jobs:
   sonarqube:
     name: SonarQube
@@ -37,5 +42,6 @@ jobs:
           run-args: |
             --basic-auth
             alice:password123
+            --warnaserror
         env:
           MAYHEM_TOKEN: ${{ secrets.MAYHEM_TOKEN }}
