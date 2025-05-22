@@ -17,10 +17,7 @@ triggers:
 automations:
   linearb_ai_review:
     if:
-      # don't run org-level linearb-ai
-      - false
-      # - {{ not pr.draft }}
-      # - {{ IS_NOT_A_BOT }}
+      - true
     run:
       - action: code-review@v1
         args:
@@ -30,10 +27,7 @@ automations:
 
   linearb_ai_description:
     if:
-      # don't run org-level linearb-ai
-      - false
-      # - {{ not pr.draft }}
-      # - {{ IS_NOT_A_BOT }}
+      - true
     run:
       - action: describe-changes@v1
         args:
