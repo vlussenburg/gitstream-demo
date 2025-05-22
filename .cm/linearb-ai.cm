@@ -25,6 +25,8 @@ automations:
       - action: code-review@v1
         args:
           approve_on_LGTM: true
+          prompt: |
+                    You are a security-focused code reviewer. Focus on logic errors, input validation, and unsafe patterns. Use clear, bullet-point suggestions.
 
   linearb_ai_description:
     if:
@@ -36,5 +38,9 @@ automations:
       - action: describe-changes@v1
         args:
           concat_mode: append
+          guidelines: |
+                        Remove all unnecessary checkboxes.
+                        Try to extract the Jira ticket from "{{ branch.name }}" or "{{ pr.title }}" and fill it into the template.
+                        Jira ticket should be in format ABC-12345.
 
 IS_NOT_A_BOT: {{ pr.author | match(list=['github-actions', 'dependabot', '[bot]']) | nope }}
