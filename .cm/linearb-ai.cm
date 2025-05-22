@@ -22,7 +22,7 @@ automations:
       - action: code-review@v1
         args:
           approve_on_LGTM: true
-          prompt: |
+          guidelines: |
                     You are a security-focused code reviewer. Focus on logic errors, input validation, and unsafe patterns. Use clear, bullet-point suggestions.
 
   linearb_ai_description:
