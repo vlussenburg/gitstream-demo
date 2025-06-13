@@ -37,8 +37,10 @@ jobs:
     name: gitStream workflow automation
     steps:
       - name: Evaluate Rules
-        uses: linear-b/gitstream-github-action@v2
+        uses: vlussenburg/gitstream-github-action@d9186b771e3bdb0bf3c74f98c9a97c43bae1f60a
         id: rules-engine
+        env:
+          SKIP_FULL_HISTORY: true
         with:
           full_repository: ${{ github.event.inputs.full_repository }}
           head_ref: ${{ github.event.inputs.head_ref }}
