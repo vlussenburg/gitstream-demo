@@ -11,6 +11,8 @@ A full-stack demo app used to showcase `gitStream` automations like AI, `codeExp
 - `.cm/` – gitStream config
 - `docker-compose.yml` – Runs everything
 
+
+
 ## 🧭 Architecture
 
 ```mermaid
