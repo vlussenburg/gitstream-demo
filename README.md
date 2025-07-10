@@ -13,6 +13,7 @@ A full-stack demo app used to showcase `gitStream` automations like AI, `codeExp
 
 
 
+
 ## 🧭 Architecture
 
 ```mermaid
