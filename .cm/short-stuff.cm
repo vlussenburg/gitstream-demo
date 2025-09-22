@@ -29,7 +29,7 @@ automations:
           color: {{ colors.red if (calc.etr >= 20) else (colors.yellow if (calc.etr >= 5) else colors.green) }}
 
       - action: add-label@v1
-        when :  {{ pr.unresolved_threads }}
+        when:  {{ pr.unresolved_threads }}
         args:
           label: "{{ pr.unresolved_threads | default(value=0) }} unresolved thread(s)"
           color: {{ colors.yellow }}
