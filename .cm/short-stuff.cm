@@ -3,20 +3,6 @@ manifest:
   version: 1.0
 
 automations:
-  linearb_ai_codereview:
-    # 2) Ai Code Review - Triggers only when PR is created or has new commits, see docs https://docs.gitstream.cm/execution-model/#action-level-execution-control
-    on: [pr_created]
-    if:
-      - {{ not pr.draft }}
-      - {{ not is.bot }}
-    run:
-      - action: code-review@v1
-        args:
-          guidelines: |
-            - Highlight **critical issues** only (correctness/logic, performance, security, maintainability blockers).
-            - Skip nitpicks; ignore null-reference risks that are known to be validated earlier in this code path.
-            - Keep suggestions short and actionable.
-
   pr_policy_low_noise:
     on: [pr_created, commit]
     if:
@@ -27,6 +13,14 @@ automations:
       - action: describe-changes@v1
         args:
           concat_mode: append
+          
+      # 2) Ai Code Review - Triggers only when PR is created or has new commits, see docs https://docs.gitstream.cm/execution-model/#action-level-execution-control
+      - action: code-review@v1
+        args:
+          guidelines: |
+            - Highlight **critical issues** only (correctness/logic, performance, security, maintainability blockers).
+            - Skip nitpicks; ignore null-reference risks that are known to be validated earlier in this code path.
+            - Keep suggestions short and actionable.
 
       # 3) Quiet labels
       - action: add-label@v1
